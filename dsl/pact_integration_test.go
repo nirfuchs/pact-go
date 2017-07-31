@@ -55,27 +55,8 @@ func TestPact_Integration(t *testing.T) {
 			return err
 		}
 
-		// Setup a complex interaction
-		jumper := Like(`"jumper"`)
-		shirt := Like(`"shirt"`)
-		tag := EachLike(fmt.Sprintf(`[%s, %s]`, jumper, shirt), 2)
-		size := Like(10)
-		colour := Term("red", "red|green|blue")
-
-		body :=
-			formatJSON(
-				EachLike(
-					EachLike(
-						fmt.Sprintf(
-							`{
-            "name": "%s",
-						"size": %s,
-						"colour": %s,
-            "tag": %s,
-            "price": 1.07
-					}`, name, size, colour, tag),
-						1),
-					1))
+		// Test https://github.com/pact-foundation/pact-go/issues/41
+		body := EachLike(Term("ab全cd", "全"), 1)
 
 		// Set up our interactions. Note we have multiple in this test case!
 		consumerPact.
@@ -100,9 +81,9 @@ func TestPact_Integration(t *testing.T) {
 				Method: "POST",
 				Path:   "/bazbat",
 				Body: fmt.Sprintf(`
-          {
-            "name": "%s"
-          }`, name),
+		      {
+		        "name": "%s"
+		      }`, name),
 			}).
 			WillRespondWith(Response{
 				Status: 200,
@@ -217,27 +198,9 @@ func setupProviderAPI() int {
 	mux.HandleFunc("/bazbat", func(w http.ResponseWriter, req *http.Request) {
 		log.Println("[DEBUG] provider API: /bazbat")
 		w.Header().Add("Content-Type", "application/json")
-		fmt.Fprintf(w, `
-			[
-			  [
-			    {
-            "name": "%s",
-            "size": 10,
-            "colour": "red",
-            "price": 17.01,
-			      "tag": [
-			        [
-			          "jumper",
-			          "shirt"
-			        ],
-			        [
-			          "jumper",
-			          "shirt"
-			        ]
-			      ]
-			    }
-			  ]
-			]`, name)
+
+		// Test https://github.com/pact-foundation/pact-go/issues/41
+		fmt.Fprintf(w, `["全"]`)
 	})
 
 	go http.ListenAndServe(fmt.Sprintf(":%d", port), mux)
