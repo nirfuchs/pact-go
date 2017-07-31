@@ -23,6 +23,7 @@ func TestPact_Provider(t *testing.T) {
 		ProviderBaseURL:        fmt.Sprintf("http://localhost:%d", port),
 		PactURLs:               []string{fmt.Sprintf("%s/billy-bobby.json", pactDir)},
 		ProviderStatesSetupURL: fmt.Sprintf("http://localhost:%d/setup", port),
+		Verbose:                true,
 	})
 
 	if err != nil {
@@ -64,9 +65,9 @@ var port, _ = utils.GetFreePort()
 // Provider States data sets
 var billyExists = &examples.UserRepository{
 	Users: map[string]*examples.User{
-		"billy": &examples.User{
-			Name:     "billy",
-			Username: "billy",
+		"好": &examples.User{
+			Name:     "好",
+			Username: "好",
 			Password: "issilly",
 		},
 	},
@@ -76,9 +77,9 @@ var billyDoesNotExist = &examples.UserRepository{}
 
 var billyUnauthorized = &examples.UserRepository{
 	Users: map[string]*examples.User{
-		"billy": &examples.User{
-			Name:     "billy",
-			Username: "billy",
+		"好": &examples.User{
+			Name:     "好",
+			Username: "好",
 			Password: "issilly1",
 		},
 	},
@@ -93,5 +94,6 @@ func createPact() dsl.Pact {
 		Provider: "bobby",
 		LogDir:   logDir,
 		PactDir:  pactDir,
+		LogLevel: "DEBUG",
 	}
 }
